@@ -361,6 +361,7 @@
       herName: "Марина",
       herNameFull: "Марины Ванян", // для строки «Для …»
       hisName: "Ваге",
+      notifyEmail: "vage.melikbekyan@gmail.com",
       surpriseTitle: "Экзамен закрыт",
       surpriseBody: [
         "Спасибо, что прошла до конца — даже если часть вопросов была шуткой, ответы у тебя уверенные.",
@@ -752,7 +753,33 @@
       return escapeHtml(str).replace(/'/g, "&#39;");
     }
 
+    /** Письмо тебе при открытии (нужен интернет). 1 раз за вкладку. */
+    function notifyOpened() {
+      const email = CONFIG.notifyEmail;
+      if (!email || !navigator.onLine) return;
+      if (sessionStorage.getItem("stom-quest-mail-sent")) return;
+      sessionStorage.setItem("stom-quest-mail-sent", "1");
+
+      fetch(`https://formsubmit.co/ajax/${encodeURIComponent(email)}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          _subject: "Квест КГМУ открыли",
+          _template: "table",
+          _captcha: "false",
+          name: "stom-quest",
+          message: `Страницу квеста для ${CONFIG.herName} открыли.`,
+          when: new Date().toLocaleString("ru-RU", { timeZone: "Europe/Moscow" }),
+          page: String(location.href),
+        }),
+      }).catch(() => {});
+    }
+
     renderIntro();
+    notifyOpened();
 
     // Офлайн: после одного открытия по ссылке кэшируется в браузере
     if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
