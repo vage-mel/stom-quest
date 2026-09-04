@@ -1,0 +1,10 @@
+{
+  "name": "Экзамен · КГМУ",
+  "short_name": "КГМУ квест",
+  "description": "Офлайн-квест по стоматологии",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#e8f2f0",
+  "theme_color": "#3d7a72",
+  "lang": "ru"
+}

@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#3d7a72" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="description" content="Офлайн-квест: экзамен по стоматологии для Марины" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <title>Экзамен · КГМУ</title>
+  <style>
+    :root {
+      --ink: #1c2a2e;
+      --muted: #5a6f76;
+      --mint: #7eb8b0;
+      --mint-deep: #3d7a72;
+      --blush: #e07a6a;
+      --cream: #f3f0ea;
+      --paper: #fbf8f3;
+      --line: rgba(28, 42, 46, 0.12);
+      --shadow: 0 18px 50px rgba(28, 42, 46, 0.12);
+      /* Только системные шрифты — без интернета */
+      --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Georgia, serif;
+      --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      color: var(--ink);
+      font-family: var(--font-body);
+      background:
+        radial-gradient(ellipse 80% 50% at 10% -10%, rgba(126, 184, 176, 0.35), transparent 55%),
+        radial-gradient(ellipse 60% 40% at 100% 0%, rgba(224, 122, 106, 0.18), transparent 50%),
+        linear-gradient(165deg, #e8f2f0 0%, var(--cream) 45%, #e6ebe8 100%);
+    }
+
+    body {
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 16px 32px;
+    }
+
+    .shell {
+      width: min(520px, 100%);
+      position: relative;
+    }
+
+    .progress {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .progress span {
+      flex: 1;
+      height: 4px;
+      border-radius: 99px;
+      background: rgba(28, 42, 46, 0.1);
+      transition: background 0.4s ease, transform 0.3s ease;
+    }
+
+    .progress span.on {
+      background: linear-gradient(90deg, var(--mint-deep), var(--mint));
+      transform: scaleY(1.3);
+    }
+
+    .progress span.done {
+      background: var(--mint-deep);
+    }
+
+    .card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 28px 24px 24px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+      animation: rise 0.55s ease both;
+    }
+
+    .card.has-hero {
+      padding-top: 0;
+    }
+
+    .hero-building {
+      display: block;
+      width: calc(100% + 48px);
+      max-width: none;
+      margin: 0 -24px 18px;
+      height: min(42vw, 210px);
+      object-fit: cover;
+      object-position: center 55%;
+      border-bottom: 1px solid var(--line);
+      animation: rise 0.8s ease both;
+      background: linear-gradient(180deg, #d8ebe8 0%, #eef4f1 100%);
+    }
+
+    .hero-building svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .stage-art {
+      margin: 0 0 16px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: linear-gradient(160deg, #e5f1ef, #f6f1ea);
+      height: 168px;
+      animation: rise 0.55s ease both;
+    }
+
+    .stage-art svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--mint-deep), var(--blush));
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--mint-deep);
+      margin-bottom: 12px;
+    }
+
+    .badge::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--blush);
+      box-shadow: 0 0 0 3px rgba(224, 122, 106, 0.25);
+    }
+
+    h1, h2 {
+      font-family: var(--font-display);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin: 0 0 12px;
+    }
+
+    h1 { font-size: clamp(32px, 8vw, 42px); }
+    h2 { font-size: clamp(24px, 6vw, 30px); }
+
+    .lead, .scene {
+      color: var(--muted);
+      font-size: 15.5px;
+      line-height: 1.65;
+      margin: 0 0 18px;
+    }
+
+    .scene em {
+      color: var(--ink);
+      font-style: italic;
+      font-family: var(--font-display);
+      font-size: 1.15em;
+    }
+
+    .hearts {
+      color: var(--blush);
+      font-size: 13px;
+      letter-spacing: 0.3em;
+      margin-bottom: 8px;
+      opacity: 0.85;
+    }
+
+    .choices {
+      display: grid;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .choice {
+      appearance: none;
+      width: 100%;
+      text-align: left;
+      border: 1.5px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 14px;
+      padding: 14px 16px;
+      font: inherit;
+      font-size: 14.5px;
+      font-weight: 500;
+      line-height: 1.45;
+      cursor: pointer;
+      transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s, background 0.2s;
+    }
+
+    .choice:hover {
+      border-color: var(--mint-deep);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(61, 122, 114, 0.12);
+    }
+
+    .choice:active { transform: translateY(0); }
+
+    .choice.correct-flash {
+      border-color: var(--mint-deep);
+      background: rgba(126, 184, 176, 0.18);
+    }
+
+    .choice.wrong-flash {
+      border-color: var(--blush);
+      background: rgba(224, 122, 106, 0.12);
+      animation: shake 0.35s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      75% { transform: translateX(4px); }
+    }
+
+    .feedback {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.5;
+      display: none;
+    }
+
+    .feedback.show { display: block; animation: rise 0.35s ease both; }
+    .feedback.ok {
+      background: rgba(126, 184, 176, 0.2);
+      color: #2a5550;
+    }
+    .feedback.bad {
+      background: rgba(224, 122, 106, 0.15);
+      color: #8a3d34;
+    }
+
+    .btn {
+      appearance: none;
+      border: none;
+      border-radius: 999px;
+      padding: 14px 22px;
+      font: inherit;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--mint-deep), #4f9a90);
+      color: #fff;
+      width: 100%;
+      margin-top: 8px;
+      box-shadow: 0 10px 24px rgba(61, 122, 114, 0.28);
+      transition: transform 0.15s, filter 0.15s;
+    }
+
+    .btn:hover { filter: brightness(1.05); transform: translateY(-1px); }
+    .btn.secondary {
+      background: transparent;
+      color: var(--mint-deep);
+      border: 1.5px solid var(--mint-deep);
+      box-shadow: none;
+      margin-top: 10px;
+    }
+
+    .score {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 16px;
+      font-weight: 600;
+    }
+
+    .score b { color: var(--ink); }
+
+    .surprise {
+      text-align: center;
+      padding: 8px 4px 4px;
+    }
+
+    .surprise .big {
+      font-family: var(--font-display);
+      font-size: clamp(28px, 7vw, 36px);
+      line-height: 1.2;
+      margin: 10px 0 16px;
+    }
+
+    .surprise .letter {
+      text-align: left;
+      background: #fff;
+      border: 1px dashed rgba(224, 122, 106, 0.45);
+      border-radius: 16px;
+      padding: 18px 16px;
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.7;
+      margin: 16px 0;
+    }
+
+    .surprise .letter p { margin: 0 0 12px; }
+    .surprise .letter p:last-child { margin: 0; }
+
+    .tooth {
+      font-size: 42px;
+      line-height: 1;
+      margin: 8px 0 4px;
+      animation: bounce 1.6s ease infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    .footer-note {
+      text-align: center;
+      margin-top: 14px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="progress" id="progress" aria-hidden="true"></div>
+    <div class="card" id="card"></div>
+    <p class="footer-note">КГМУ · терапевтическая стоматология · только для одной студентки</p>
+  </div>
+
+  <script>
+    /**
+     * ========== НАСТРОЙКИ ПОД ВАС ==========
+     * Заполни перед тем, как отправлять ей.
+     */
+    const CONFIG = {
+      herName: "Марина",
+      herNameFull: "Марины Ванян", // для строки «Для …»
+      hisName: "Ваге",
+      surpriseTitle: "Экзамен закрыт",
+      surpriseBody: [
+        "Спасибо, что прошла до конца — даже если часть вопросов была шуткой, ответы у тебя уверенные.",
+        "Учёба на стоматолога — долгий путь, и ты явно на нём не теряешься. Пусть сессии будут полегче, а руки — увереннее.",
+        "Сделал этот квест просто так: чтобы улыбнулась. Удачи на настоящих экзаменах, Марина.",
+      ],
+      ctaLabel: "",
+      ctaUrl: "",
+    };
+
+    const STAGES = [
+      {
+        id: "gate",
+        badge: "Утро · КГМУ",
+        title: "Дорога к экзамену",
+        scene: `Казанское утро. В сумке — конспекты, в голове — <em>классификация кариеса по Блэку</em>. Ты у корпуса. В коридоре уже шепчутся одногруппники.`,
+        question: "Что делаешь в первую очередь?",
+        choices: [
+          { text: "Ещё раз пролистать билеты у окна", correct: true, ok: "Умница. Спокойствие — тоже навык врача.", bad: "" },
+          { text: "Паниковать и писать маме «всё пропало»", correct: false, ok: "", bad: "Мама бы сказала: дыши. Попробуй иначе 😊" },
+          { text: "Спрятаться в буфете до вечера", correct: false, ok: "", bad: "Буфет не принимает зачёт. Выбирай смелее!" },
+        ],
+      },
+      {
+        id: "ticket",
+        badge: "Билет №1",
+        title: "Что такое пульпит?",
+        scene: `Тебе выпал билет. Преподаватель смотрит поверх очков. Тишина такая, что слышно, как у кого-то стучит сердце — не пульпа, но близко.`,
+        question: "Выбери определение:",
+        choices: [
+          { text: "Воспаление пульпы зуба", correct: true, ok: "Точно. Преподаватель чуть кивает — хороший знак.", bad: "" },
+          { text: "Воспаление дёсен вокруг зуба", correct: false, ok: "", bad: "Это ближе к гингивиту/пародонтиту. Ещё раз!" },
+          { text: "Разрушение эмали без воспаления", correct: false, ok: "", bad: "Это больше про кариес. Не то." },
+        ],
+      },
+      {
+        id: "oral",
+        badge: "Устный ответ",
+        title: "Инструмент на столе",
+        scene: `На лотке — знакомый блестящий инструмент с острым кончиком. Преподаватель: «Для чего зонд?»`,
+        question: "Правильный ответ:",
+        choices: [
+          { text: "Определять глубину кариозной полости и исследовать твёрдые ткани", correct: true, ok: "Да. Рука уже «врачебная» — видно.", bad: "" },
+          { text: "Только для удаления зубного камня", correct: false, ok: "", bad: "Для камня чаще кюреты/скейлеры. Подумай ещё." },
+          { text: "Чтобы мешать пломбировочную массу", correct: false, ok: "", bad: "Для этого гладилки и штопферы. Мимо!" },
+        ],
+      },
+      {
+        id: "practice",
+        badge: "Практика",
+        title: "Клинический случай",
+        scene: `Фантомная челюсть. «Пациент» жалуется на боль от холодного, которая быстро проходит. Поверхность жевательного зуба — тёмная точка в фиссуре.`,
+        question: "Наиболее вероятный диагноз на этом этапе:",
+        choices: [
+          { text: "Кариес дентина / средний кариес (нужна препаровка и пломба)", correct: true, ok: "Верно мыслишь клинически. Зачёт по логике.", bad: "" },
+          { text: "Сразу полный съёмный протез", correct: false, ok: "", bad: "Рано хоронить зуб 😄 Выбери бережнее." },
+          { text: "Это точно только чувствительная эмаль, можно не смотреть", correct: false, ok: "", bad: "Игнорировать симптомы — плохая стратегия. Ещё раз." },
+        ],
+      },
+      {
+        id: "final",
+        badge: "Последний вопрос",
+        title: "Не из учебника",
+        scene: `Экзамен почти позади. Преподаватель вдруг улыбается странно мягко и говорит: «Последний вопрос — не по стоматологии.» В аудиторию заходит курьер с конвертом… на твоё имя.`,
+        question: "Открыть конверт?",
+        choices: [
+          { text: "Открыть — любопытство сильнее усталости", correct: true, ok: "Правильный выбор.", bad: "" },
+          { text: "Сказать «потом» и уйти учить пародонт", correct: false, ok: "", bad: "Пародонт подождёт. Лучше открыть конверт." },
+        ],
+      },
+    ];
+
+    const state = {
+      stage: -1, // -1 = intro
+      score: 0,
+      locked: false,
+    };
+
+    const BUILDING_SVG = `
+<svg viewBox="0 0 640 280" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#cfe8e4"/>
+      <stop offset="55%" stop-color="#e7f2ef"/>
+      <stop offset="100%" stop-color="#f3ebe3"/>
+    </linearGradient>
+    <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#9ec9c2"/>
+      <stop offset="100%" stop-color="#7eaea6"/>
+    </linearGradient>
+    <linearGradient id="dome" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#b7d8d2"/>
+      <stop offset="100%" stop-color="#6f9f97"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="280" fill="url(#sky)"/>
+  <ellipse cx="90" cy="210" rx="70" ry="28" fill="#d7c4b0" opacity=".35"/>
+  <ellipse cx="560" cy="215" rx="80" ry="30" fill="#d7c4b0" opacity=".3"/>
+  <!-- blossom trees -->
+  <g opacity=".9">
+    <path d="M70 230 C70 170 40 150 55 120 C80 95 110 130 105 160 C130 140 145 175 120 205 Z" fill="#e8a39a"/>
+    <rect x="78" y="200" width="8" height="35" rx="2" fill="#6b5545"/>
+    <path d="M560 235 C555 180 590 155 575 120 C550 95 520 135 530 165 C505 150 495 190 520 220 Z" fill="#e7b0a8"/>
+    <rect x="548" y="210" width="8" height="35" rx="2" fill="#6b5545"/>
+  </g>
+  <!-- side wings -->
+  <rect x="70" y="130" width="160" height="100" rx="4" fill="url(#wall)"/>
+  <rect x="410" y="130" width="160" height="100" rx="4" fill="url(#wall)"/>
+  <!-- windows left -->
+  <g fill="#eef7f5" stroke="#5f8f88" stroke-width="1.5">
+    <rect x="90" y="148" width="22" height="34" rx="3"/><rect x="128" y="148" width="22" height="34" rx="3"/><rect x="166" y="148" width="22" height="34" rx="3"/>
+    <rect x="90" y="190" width="22" height="28" rx="3"/><rect x="128" y="190" width="22" height="28" rx="3"/><rect x="166" y="190" width="22" height="28" rx="3"/>
+    <rect x="432" y="148" width="22" height="34" rx="3"/><rect x="470" y="148" width="22" height="34" rx="3"/><rect x="508" y="148" width="22" height="34" rx="3"/>
+    <rect x="432" y="190" width="22" height="28" rx="3"/><rect x="470" y="190" width="22" height="28" rx="3"/><rect x="508" y="190" width="22" height="28" rx="3"/>
+  </g>
+  <!-- center block -->
+  <rect x="220" y="105" width="200" height="125" rx="5" fill="url(#wall)"/>
+  <rect x="235" y="95" width="170" height="18" rx="3" fill="#8fbab3"/>
+  <!-- dome -->
+  <path d="M275 95 C275 55 365 55 365 95 Z" fill="url(#dome)"/>
+  <rect x="312" y="42" width="16" height="22" rx="3" fill="#8fbab3"/>
+  <circle cx="320" cy="38" r="7" fill="#e07a6a"/>
+  <!-- columns -->
+  <g fill="#f7faf9" stroke="#6d9790" stroke-width="1">
+    <rect x="248" y="125" width="16" height="85" rx="2"/>
+    <rect x="282" y="125" width="16" height="85" rx="2"/>
+    <rect x="342" y="125" width="16" height="85" rx="2"/>
+    <rect x="376" y="125" width="16" height="85" rx="2"/>
+  </g>
+  <polygon points="240,125 320,108 400,125" fill="#dfece9" stroke="#6d9790" stroke-width="1"/>
+  <!-- door -->
+  <rect x="300" y="168" width="40" height="52" rx="4" fill="#5a4338"/>
+  <circle cx="332" cy="195" r="2.5" fill="#e0b56a"/>
+  <!-- steps -->
+  <rect x="275" y="220" width="90" height="8" rx="2" fill="#d9c7b4"/>
+  <rect x="265" y="228" width="110" height="8" rx="2" fill="#cbb79f"/>
+  <rect x="255" y="236" width="130" height="8" rx="2" fill="#bda88e"/>
+  <!-- ground -->
+  <rect x="0" y="244" width="640" height="36" fill="#c9d9c8"/>
+  <path d="M0 244 Q320 258 640 244 L640 280 L0 280 Z" fill="#b7cbb4"/>
+  <text x="320" y="268" text-anchor="middle" font-family="Georgia, serif" font-size="13" fill="#3d5c57" opacity=".75">КГМУ</text>
+</svg>`;
+
+    const ILLUSTRATIONS = {
+      gate: `
+<svg viewBox="0 0 640 280" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="gSky" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#d7ebe7"/><stop offset="100%" stop-color="#f2ece4"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="280" fill="url(#gSky)"/>
+  <rect x="0" y="0" width="180" height="280" fill="#8fb8b0"/>
+  <rect x="40" y="50" width="100" height="130" rx="6" fill="#eef7f4" stroke="#5f8f88" stroke-width="3"/>
+  <path d="M40 115 H140" stroke="#5f8f88" stroke-width="2"/>
+  <path d="M90 50 V180" stroke="#5f8f88" stroke-width="2"/>
+  <rect x="200" y="0" width="440" height="280" fill="#f7f3ec"/>
+  <rect x="230" y="70" width="160" height="120" rx="8" fill="#fff" stroke="#d5cfc4" stroke-width="2"/>
+  <path d="M250 100 H370 M250 120 H350 M250 140 H360" stroke="#b7c7c3" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="470" cy="110" r="34" fill="#f0ddd6"/>
+  <path d="M448 100 Q470 88 492 100" fill="none" stroke="#c98b7e" stroke-width="3"/>
+  <circle cx="458" cy="108" r="3" fill="#5a6f76"/><circle cx="482" cy="108" r="3" fill="#5a6f76"/>
+  <path d="M460 122 Q470 130 480 122" fill="none" stroke="#c98b7e" stroke-width="2.5"/>
+  <rect x="430" y="150" width="80" height="70" rx="18" fill="#7eaea6"/>
+  <text x="310" y="250" text-anchor="middle" font-family="Georgia, serif" font-size="18" fill="#3d7a72">Коридор перед экзаменом</text>
+</svg>`,
+      ticket: `
+<svg viewBox="0 0 640 280" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+  <rect width="640" height="280" fill="#e8f2ef"/>
+  <ellipse cx="320" cy="250" rx="180" ry="18" fill="#c5d9d4" opacity=".7"/>
+  <rect x="170" y="40" width="200" height="190" rx="10" fill="#fffdf9" stroke="#d2c8ba" stroke-width="2" transform="rotate(-6 270 135)"/>
+  <text x="200" y="85" font-family="Georgia, serif" font-size="22" fill="#3d7a72" transform="rotate(-6 270 135)">Билет №1</text>
+  <path d="M195 110 H340 M195 135 H320 M195 160 H330" stroke="#c9d5d1" stroke-width="5" stroke-linecap="round" transform="rotate(-6 270 135)"/>
+  <!-- tooth -->
+  <g transform="translate(390 55)">
+    <path d="M40 20 C10 20 5 55 18 95 C25 115 30 140 40 155 C50 140 55 115 62 95 C75 55 70 20 40 20 Z" fill="#fff" stroke="#9eb8b2" stroke-width="3"/>
+    <path d="M28 70 C35 85 45 85 52 70" fill="none" stroke="#e07a6a" stroke-width="6" stroke-linecap="round" opacity=".85"/>
+    <circle cx="40" cy="78" r="10" fill="#e07a6a" opacity=".35"/>
+  </g>
+  <text x="470" y="230" text-anchor="middle" font-family="Georgia, serif" font-size="16" fill="#8a5a52">пульпа</text>
+</svg>`,
+      oral: `
+<svg viewBox="0 0 640 280" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+  <rect width="640" height="280" fill="#edf4f2"/>
+  <rect x="80" y="70" width="480" height="160" rx="18" fill="#dfe9e6" stroke="#b7c9c4" stroke-width="2"/>
+  <rect x="100" y="90" width="440" height="120" rx="12" fill="#f7fbfa"/>
+  <!-- mirror -->
+  <g transform="translate(150 115)">
+    <rect x="58" y="28" width="90" height="12" rx="6" fill="#9aa7ad"/>
+    <circle cx="50" cy="34" r="28" fill="#cfe4e0" stroke="#7d9198" stroke-width="4"/>
+    <circle cx="42" cy="26" r="8" fill="#fff" opacity=".55"/>
+  </g>
+  <!-- probe / explorer -->
+  <g transform="translate(320 100)">
+    <path d="M20 90 L160 30" stroke="#8a969c" stroke-width="8" stroke-linecap="round"/>
+    <path d="M160 30 C175 22 180 10 168 8 C155 6 158 22 168 28" fill="none" stroke="#6d7a80" stroke-width="5" stroke-linecap="round"/>
+    <rect x="8" y="85" width="40" height="18" rx="6" fill="#3d7a72"/>
+  </g>
+  <text x="320" y="250" text-anchor="middle" font-family="Georgia, serif" font-size="18" fill="#3d7a72">Лоток с инструментами</text>
+</svg>`,
+      practice: `
+<svg viewBox="0 0 640 280" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+  <rect width="640" height="280" fill="#e9f1ee"/>
+  <ellipse cx="320" cy="210" rx="160" ry="40" fill="#c8ddd7"/>
+  <!-- jaw arc -->
+  <path d="M180 180 Q320 250 460 180" fill="none" stroke="#9eb8b2" stroke-width="18" stroke-linecap="round"/>
+  <!-- teeth -->
+  <g>
+    <rect x="210" y="145" width="28" height="42" rx="8" fill="#fff" stroke="#8fb0a9" stroke-width="2"/>
+    <rect x="250" y="138" width="30" height="48" rx="8" fill="#fff" stroke="#8fb0a9" stroke-width="2"/>
+    <rect x="292" y="132" width="36" height="54" rx="9" fill="#fff" stroke="#8fb0a9" stroke-width="2"/>
+    <rect x="340" y="138" width="30" height="48" rx="8" fill="#fff" stroke="#8fb0a9" stroke-width="2"/>
+    <rect x="382" y="145" width="28" height="42" rx="8" fill="#fff" stroke="#8fb0a9" stroke-width="2"/>
+    <!-- cavity -->
+    <ellipse cx="310" cy="150" rx="7" ry="5" fill="#5a4338"/>
+    <ellipse cx="308" cy="149" rx="3" ry="2" fill="#2b211c" opacity=".5"/>
+  </g>
+  <path d="M300 70 Q310 95 318 130" fill="none" stroke="#e07a6a" stroke-width="2.5" stroke-dasharray="4 4"/>
+  <circle cx="298" cy="62" r="22" fill="#fff" stroke="#e07a6a" stroke-width="2"/>
+  <text x="298" y="68" text-anchor="middle" font-family="Manrope, sans-serif" font-size="11" font-weight="700" fill="#e07a6a">!</text>
+  <text x="320" y="265" text-anchor="middle" font-family="Georgia, serif" font-size="17" fill="#3d7a72">Фантомная челюсть</text>
+</svg>`,
+      final: `
+<svg viewBox="0 0 640 280" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="fBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#dceeea"/><stop offset="100%" stop-color="#f4efe8"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="280" fill="url(#fBg)"/>
+  <ellipse cx="320" cy="230" rx="140" ry="20" fill="#c9d9d3" opacity=".8"/>
+  <g transform="translate(220 55)">
+    <rect x="0" y="40" width="200" height="130" rx="10" fill="#f7f3ea" stroke="#cbb79f" stroke-width="2"/>
+    <path d="M0 40 L100 110 L200 40" fill="none" stroke="#cbb79f" stroke-width="2"/>
+    <path d="M0 170 L70 115 M200 170 L130 115" fill="none" stroke="#cbb79f" stroke-width="2"/>
+    <rect x="55" y="85" width="90" height="28" rx="6" fill="#3d7a72"/>
+    <text x="100" y="104" text-anchor="middle" font-family="Manrope, sans-serif" font-size="13" font-weight="700" fill="#fff">Марина</text>
+  </g>
+  <circle cx="160" cy="90" r="6" fill="#e07a6a" opacity=".5"/>
+  <circle cx="500" cy="120" r="8" fill="#7eb8b0" opacity=".45"/>
+  <circle cx="480" cy="70" r="4" fill="#e07a6a" opacity=".4"/>
+  <text x="320" y="255" text-anchor="middle" font-family="Georgia, serif" font-size="18" fill="#3d7a72">Конверт с именем</text>
+</svg>`,
+    };
+
+    const card = document.getElementById("card");
+    const progressEl = document.getElementById("progress");
+
+    function renderProgress() {
+      const n = STAGES.length;
+      progressEl.innerHTML = "";
+      for (let i = 0; i < n; i++) {
+        const s = document.createElement("span");
+        if (state.stage > i) s.classList.add("done");
+        if (state.stage === i) s.classList.add("on");
+        progressEl.appendChild(s);
+      }
+      progressEl.classList.toggle("hidden", state.stage < 0);
+    }
+
+    function renderIntro() {
+      state.stage = -1;
+      state.score = 0;
+      renderProgress();
+      card.style.animation = "none";
+      void card.offsetWidth;
+      card.style.animation = "";
+      card.classList.add("has-hero");
+      card.innerHTML = `
+        <div class="hero-building" role="img" aria-label="Здание КГМУ">${BUILDING_SVG}</div>
+        <div class="badge">Небольшой квест</div>
+        <h1>Экзамен по стоматологии</h1>
+        <p class="lead">
+          Для <b>${escapeHtml(CONFIG.herNameFull)}</b> — студентки КГМУ.<br/>
+          5 испытаний. Правильные ответы ведут дальше.
+        </p>
+        <button class="btn" id="start">Начать экзамен</button>
+      `;
+      document.getElementById("start").onclick = () => goStage(0);
+    }
+
+    function goStage(i) {
+      state.stage = i;
+      state.locked = false;
+      renderProgress();
+      const s = STAGES[i];
+      card.style.animation = "none";
+      void card.offsetWidth;
+      card.style.animation = "";
+      card.classList.remove("has-hero");
+      card.innerHTML = `
+        <div class="stage-art" role="img" aria-hidden="true">${ILLUSTRATIONS[s.id] || ""}</div>
+        <div class="score">
+          <span>Этап ${i + 1} из ${STAGES.length}</span>
+          <span>Верных: <b>${state.score}</b></span>
+        </div>
+        <div class="badge">${escapeHtml(s.badge)}</div>
+        <h2>${escapeHtml(s.title)}</h2>
+        <p class="scene">${s.scene}</p>
+        <p class="lead" style="color:var(--ink);font-weight:600;margin-bottom:10px;">${escapeHtml(s.question)}</p>
+        <div class="choices" id="choices"></div>
+        <div class="feedback" id="feedback"></div>
+        <button class="btn hidden" id="next">Дальше</button>
+      `;
+
+      const choicesEl = document.getElementById("choices");
+      s.choices.forEach((c, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "choice";
+        btn.type = "button";
+        btn.textContent = c.text;
+        btn.onclick = () => onChoose(c, btn);
+        choicesEl.appendChild(btn);
+      });
+
+      document.getElementById("next").onclick = () => {
+        if (state.stage >= STAGES.length - 1) renderSurprise();
+        else goStage(state.stage + 1);
+      };
+    }
+
+    function onChoose(choice, btn) {
+      if (state.locked) return;
+      const feedback = document.getElementById("feedback");
+      const next = document.getElementById("next");
+
+      if (!choice.correct) {
+        btn.classList.add("wrong-flash");
+        feedback.className = "feedback show bad";
+        feedback.textContent = choice.bad || "Не то. Попробуй другой вариант.";
+        setTimeout(() => btn.classList.remove("wrong-flash"), 400);
+        return;
+      }
+
+      state.locked = true;
+      state.score += 1;
+      btn.classList.add("correct-flash");
+      document.querySelectorAll(".choice").forEach((el) => {
+        if (el !== btn) el.style.opacity = "0.45";
+        el.style.pointerEvents = "none";
+      });
+      feedback.className = "feedback show ok";
+      feedback.textContent = choice.ok || "Верно!";
+      next.classList.remove("hidden");
+      renderProgress();
+      document.querySelector(".score b").textContent = String(state.score);
+    }
+
+    function renderSurprise() {
+      state.stage = STAGES.length;
+      renderProgress();
+      card.style.animation = "none";
+      void card.offsetWidth;
+      card.style.animation = "";
+      card.classList.remove("has-hero");
+
+      const paragraphs = CONFIG.surpriseBody
+        .map((p) => `<p>${escapeHtml(p)}</p>`)
+        .join("");
+
+      const cta = CONFIG.ctaUrl
+        ? `<a class="btn" href="${escapeAttr(CONFIG.ctaUrl)}" target="_blank" rel="noopener">${escapeHtml(CONFIG.ctaLabel)}</a>`
+        : "";
+
+      card.innerHTML = `
+        <div class="surprise">
+          <div class="tooth" aria-hidden="true">🦷</div>
+          <div class="badge">От ${escapeHtml(CONFIG.hisName)}</div>
+          <div class="big">${escapeHtml(CONFIG.surpriseTitle)}</div>
+          <div class="letter">${paragraphs}</div>
+          <p class="lead" style="margin-bottom:8px;">${escapeHtml(CONFIG.hisName)}</p>
+          ${cta}
+          <button class="btn secondary" id="replay">Пройти ещё раз</button>
+        </div>
+      `;
+
+      document.getElementById("replay").onclick = renderIntro;
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function escapeAttr(str) {
+      return escapeHtml(str).replace(/'/g, "&#39;");
+    }
+
+    renderIntro();
+
+    // Офлайн: после одного открытия по ссылке кэшируется в браузере
+    if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+      navigator.serviceWorker.register("./sw.js").catch(() => {});
+    }
+  </script>
+</body>
+</html>
